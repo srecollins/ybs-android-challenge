@@ -3,45 +3,50 @@ package com.example.ybsmobilechallenge
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.ybsmobilechallenge.model.ImageRepository
+import com.example.ybsmobilechallenge.network.ApiHelper
+import com.example.ybsmobilechallenge.network.RetrofitService.apiService
+import com.example.ybsmobilechallenge.ui.screens.HomeScreen
 import com.example.ybsmobilechallenge.ui.theme.YBSMobileChallengeTheme
+import com.example.ybsmobilechallenge.viewmodel.ImageListViewModel
+import com.example.ybsmobilechallenge.viewmodel.factory.ImageListViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        val apiHelper = ApiHelper(apiService)
+        val repository = ImageRepository(apiHelper)
+
+        val imageListViewModel: ImageListViewModel by viewModels {
+            ImageListViewModelFactory(repository)
+        }
+
         setContent {
             YBSMobileChallengeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                MyApp(imageListViewModel)
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    YBSMobileChallengeTheme {
-        Greeting("Android")
+fun MyApp(imageListViewModel: ImageListViewModel) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "homeScreen") {
+        composable("homeScreen") {
+            HomeScreen(navController, imageListViewModel)
+        }
+//            composable("imageDetail/{imageId}") { backStackEntry ->
+//                DetailScreen(navController, backStackEntry.arguments?.getString("imageId"))
+//            }
+//            composable("userImages/{userId}") { backStackEntry ->
+//                UserScreen(navController, backStackEntry.arguments?.getString("userId"))
+//            }
     }
 }
