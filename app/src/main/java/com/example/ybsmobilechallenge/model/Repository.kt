@@ -19,11 +19,15 @@ class ImageRepository(private val apiHelper: ApiHelper) {
      * 2. If the result of the above is a success and not null, it then concurrently fetches
      *    the info from the getInfo endpoint for each image.
      *
-     * @param text Optional search text used to query photos.
+     * @param tags Optional search tags used to query photos.
      * @return List<PhotoDetails> or an emptyList if no results.
      */
-    suspend fun getImages(text: String?): List<PhotoDetails> = withContext(Dispatchers.IO) {
-        val getResult = apiHelper.fetchPhotos(text = text)
+    suspend fun getImages(
+        tags: String?,
+        matchAllTags: Boolean,
+        userId: String?
+    ): List<PhotoDetails> = withContext(Dispatchers.IO) {
+        val getResult = apiHelper.fetchPhotos(tags = tags, tagMode = matchAllTags, userId = userId)
         if (getResult.isSuccess) {
             val photos = getResult.getOrNull() ?: emptyList()
 
@@ -47,7 +51,7 @@ class ImageRepository(private val apiHelper: ApiHelper) {
      * @param secret The photo secret
      * @return PhotoDetails The full details for the given image
      */
-    private suspend fun fetchPhotoDetail(photoId: String, secret: String): PhotoDetails? {
+    suspend fun fetchPhotoDetail(photoId: String, secret: String): PhotoDetails? {
         return apiHelper.fetchPhotoDetails(photoId, secret).getOrNull()
     }
 

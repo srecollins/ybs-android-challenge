@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,46 +13,58 @@ import androidx.navigation.NavController
 import com.example.ybsmobilechallenge.ui.components.ImageCard
 import com.example.ybsmobilechallenge.viewmodel.ImageListViewModel
 import androidx.compose.runtime.livedata.observeAsState
-import com.example.ybsmobilechallenge.model.response.constructUrl
-import com.example.ybsmobilechallenge.model.response.constructUserIconUrl
+import com.example.ybsmobilechallenge.ui.components.NavBar
 import com.example.ybsmobilechallenge.ui.components.SearchBar
+import com.example.ybsmobilechallenge.util.constructUrl
+import com.example.ybsmobilechallenge.util.constructUserIconUrl
+import com.example.ybsmobilechallenge.util.getConcatenatedTagsContent
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: ImageListViewModel) {
     val photos = viewModel.photos.observeAsState(initial = emptyList())
 
-    viewModel.loadPhotos("Yorkshire")
+    // initial load
+    viewModel.loadPhotos("Yorkshire", false, null)
 
-    Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-        Column {
-            SearchBar(onQueryChanged = { query ->
-                viewModel.loadPhotos(query)
+    Scaffold(topBar = { NavBar(navController = navController) },
+        bottomBar = {
+            SearchBar(onSearch = { query, tagMode ->
+                viewModel.loadPhotos(query, tagMode, null)
             })
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp)
+        },
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(innerPadding)
             ) {
-                items(
-                    items = photos.value,
-                    key = { photo -> photo.id }  // Use unique ID for recomposition optimization
-                ) { photo ->
-                    ImageCard(
-                        imageUrl = constructUrl(photo.server, photo.id, photo.secret),
-                        tags = viewModel.getConcatenatedTagsContent(photo.tags),
-                        user = photo.owner.username,
-                        userIconUrl = constructUserIconUrl(
-                            photo.owner.iconFarm.toString(),
-                            photo.owner.iconServer,
-                            photo.owner.nsid
-                        ),
-                        onImageClick = { navController.navigate("imageDetail/${photo.id}") },
-                        onUserClick = { navController.navigate("userImages/${photo.owner.nsid}") }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp)) // Add space between cards
+                Column {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = innerPadding
+                    ) {
+                        items(
+                            items = photos.value,
+                            key = { photo -> photo.id }
+                        ) { photo ->
+                            ImageCard(
+                                imageUrl = constructUrl(photo.server, photo.id, photo.secret),
+                                tags = getConcatenatedTagsContent(photo.tags),
+                                user = photo.owner.username,
+                                userIconUrl = constructUserIconUrl(
+                                    photo.owner.iconFarm.toString(),
+                                    photo.owner.iconServer,
+                                    photo.owner.nsid
+                                ),
+                                onImageClick = { navController.navigate("imageDetail/${photo.id}/${photo.secret}") },
+                                onUserClick = { navController.navigate("userImages/${photo.owner.nsid}") }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
                 }
             }
         }
-    }
+    )
 }
 

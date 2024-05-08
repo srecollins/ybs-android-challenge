@@ -31,8 +31,3 @@ data class Photo(
     @SerializedName("isfriend") val isFriend: Int,
     @SerializedName("isfamily") val isFamily: Int
 )
-
-// https://www.flickr.com/services/api/misc.urls.html
-fun constructUrl(server: String, id: String, secret: String): String {
-    return "https://live.staticflickr.com/${server}/${id}_${secret}.jpg"
-}

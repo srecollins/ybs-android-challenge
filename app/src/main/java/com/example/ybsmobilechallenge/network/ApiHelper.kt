@@ -4,8 +4,16 @@ import com.example.ybsmobilechallenge.model.response.Photo
 import com.example.ybsmobilechallenge.model.response.PhotoDetails
 
 class ApiHelper(private val apiService: ApiService) {
-    suspend fun fetchPhotos(text: String?): Result<List<Photo>> {
-        val response = apiService.getPhotos(text = text ?: "Yorkshire", userId = null)
+    suspend fun fetchPhotos(
+        tags: String?,
+        tagMode: Boolean = false,
+        userId: String?
+    ): Result<List<Photo>> {
+        val response = apiService.getPhotos(
+            tags = tags ?: "Yorkshire",
+            userId = userId,
+            tagMode = TagModeMapping.tagFromChecked(tagMode).tagModeString
+        )
         if (response.isSuccessful && response.body()?.stat == "ok") {
             return Result.success(response.body()?.photos?.photoList ?: listOf())
         } else {
@@ -25,7 +33,7 @@ class ApiHelper(private val apiService: ApiService) {
     }
 
     suspend fun fetchUserPhotos(userId: String): Result<List<Photo>> {
-        val response = apiService.getPhotos(text = "", userId = userId)
+        val response = apiService.getPhotos(tags = "", userId = userId)
         if (response.isSuccessful && response.body()?.stat == "ok") {
             return Result.success(response.body()?.photos?.photoList ?: listOf())
         } else {

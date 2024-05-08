@@ -8,6 +8,16 @@ import retrofit2.http.GET
 import retrofit2.Response
 import retrofit2.http.Query
 
+enum class TagModeMapping(val tagModeString: String, val isChecked: Boolean) {
+    ANY("all", true),
+    ALL("any", false);
+
+    companion object {
+        fun tagFromChecked(value: Boolean): TagModeMapping =
+            entries.first { it.isChecked == value }
+    }
+}
+
 interface ApiService {
     @GET("rest")
     suspend fun getPhotos(
@@ -15,7 +25,8 @@ interface ApiService {
         @Query("api_key") apiKey: String = Constants.FLICKR_API_KEY,
         @Query("user_id") userId: String?,
         @Query("format") format: String = "json",
-        @Query("text") text: String,
+        @Query("tags") tags: String,
+        @Query("tag_mode") tagMode: String = "any",
         @Query("per_page") perPage: Int = 10,
         @Query("safe_search") safeSearch: Int = 1,
         @Query("nojsoncallback") nojsoncallback: Int = 1

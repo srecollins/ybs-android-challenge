@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ybsmobilechallenge.model.ImageRepository
 import com.example.ybsmobilechallenge.model.response.PhotoDetails
-import com.example.ybsmobilechallenge.model.response.Tags
 import kotlinx.coroutines.launch
 
 class ImageListViewModel(private val repository: ImageRepository) : ViewModel() {
@@ -14,27 +13,23 @@ class ImageListViewModel(private val repository: ImageRepository) : ViewModel() 
     private val _photos = MutableLiveData<List<PhotoDetails>>()
     val photos: LiveData<List<PhotoDetails>> = _photos
 
-    var currentQuery = MutableLiveData("")
+    private var currentQuery = MutableLiveData("")
 
-    fun loadPhotos(query: String) {
+    fun loadPhotos(query: String?, matchAllTags: Boolean, userId: String?) {
         viewModelScope.launch {
-            _photos.value = repository.getImages(query)
+            _photos.value = repository.getImages(query, matchAllTags, userId)
         }
     }
 
     init {
         currentQuery.observeForever {
-            loadPhotos(it)
+            loadPhotos(it, false, null)
         }
     }
 
     override fun onCleared() {
         currentQuery.removeObserver { }
         super.onCleared()
-    }
-
-    fun getConcatenatedTagsContent(tags: Tags, delimiter: String = ", "): String {
-        return tags.tag.joinToString(separator = delimiter) { it.content }
     }
 }
 

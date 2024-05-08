@@ -46,7 +46,6 @@ fun ImageCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onImageClick)
         ) {
             Image(
                 painter =
@@ -62,6 +61,7 @@ fun ImageCard(
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth()
+                    .clickable(onClick = onImageClick)
             )
             Row(
                 modifier = Modifier
