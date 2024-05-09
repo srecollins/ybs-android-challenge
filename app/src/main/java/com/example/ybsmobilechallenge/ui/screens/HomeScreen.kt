@@ -22,6 +22,7 @@ import com.example.ybsmobilechallenge.ui.components.NavBar
 import com.example.ybsmobilechallenge.util.constructUrl
 import com.example.ybsmobilechallenge.util.constructUserIconUrl
 import com.example.ybsmobilechallenge.util.getConcatenatedTagsContent
+import com.example.ybsmobilechallenge.util.halfPadding
 import kotlinx.coroutines.launch
 
 @Composable
@@ -61,7 +62,7 @@ fun HomeScreen(navController: NavController, viewModel: ImageListViewModel) {
             Box(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(innerPadding)
+                    .padding(halfPadding(innerPadding))
             ) {
                 Column {
                     LazyColumn(
