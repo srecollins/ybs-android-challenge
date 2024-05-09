@@ -1,6 +1,6 @@
 package com.example.ybsmobilechallenge.model
 
-import com.example.ybsmobilechallenge.model.response.Photo
+import com.example.ybsmobilechallenge.model.response.FindByUsernameResponse
 import com.example.ybsmobilechallenge.model.response.PhotoDetails
 import com.example.ybsmobilechallenge.network.ApiHelper
 import kotlinx.coroutines.Dispatchers
@@ -23,11 +23,13 @@ class ImageRepository(private val apiHelper: ApiHelper) {
      * @return List<PhotoDetails> or an emptyList if no results.
      */
     suspend fun getImages(
+        text: String?,
         tags: String?,
-        matchAllTags: Boolean,
+        matchAllTags: Boolean?,
         userId: String?
     ): List<PhotoDetails> = withContext(Dispatchers.IO) {
-        val getResult = apiHelper.fetchPhotos(tags = tags, tagMode = matchAllTags, userId = userId)
+        val getResult =
+            apiHelper.fetchPhotos(text = text, tags = tags, tagMode = matchAllTags, userId = userId)
         if (getResult.isSuccess) {
             val photos = getResult.getOrNull() ?: emptyList()
 
@@ -56,22 +58,20 @@ class ImageRepository(private val apiHelper: ApiHelper) {
     }
 
     /**
-     * Retrieves a list of images based on a given userId.
+     * Retrieves a user id based on a given username
      *
-     * The function does two things:
-     * 1. Fetches a list of photos based on the search query.
-     * 2. If the result of the above is a success and not null, it then concurrently fetches
-     *    the info from the getInfo endpoint for each image.
+     * The username API endpoint does a full text search, so the username must be exact
      *
-     * @param userId The user nsid from the Image Details.
-     * @return List<Photo> or an emptyList if no results.
+     * @param username The username entered in a Search
+     * @return FindByUsernameResponse
      */
-    suspend fun getImagesByUser(userId: String): List<Photo> = withContext(Dispatchers.IO) {
-        val result = apiHelper.fetchUserPhotos(userId)
-        if (result.isSuccess) {
-            result.getOrDefault(emptyList())
-        } else {
-            emptyList()
+    suspend fun getUserByUsername(username: String): FindByUsernameResponse? =
+        withContext(Dispatchers.IO) {
+            val result = apiHelper.findByUsername(username)
+            if (result.isSuccess) {
+                result.getOrDefault(null)
+            } else {
+                null
+            }
         }
-    }
 }

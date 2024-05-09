@@ -8,4 +8,5 @@ object Constants {
 object Endpoints {
     const val FLICKR_GET_PHOTOS_METHOD = "flickr.photos.search"
     const val FLICKR_GET_PHOTO_INFO_METHOD = "flickr.photos.getInfo"
+    const val FLICKR_GET_USER_ID_METHOD = "flickr.people.findByUsername"
 }

@@ -23,7 +23,7 @@ fun UserScreen(navController: NavController, viewModel: ImageListViewModel, user
     val photos = viewModel.photos.observeAsState(initial = emptyList())
 
     // initial load
-    viewModel.loadPhotos(null, false, userId)
+    viewModel.loadPhotos(null, "", false, userId)
 
     Scaffold(topBar = { NavBar(navController = navController) },
         content = { innerPadding ->

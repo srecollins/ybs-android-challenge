@@ -1,5 +1,6 @@
 package com.example.ybsmobilechallenge.network
 
+import com.example.ybsmobilechallenge.model.response.FindByUsernameResponse
 import com.example.ybsmobilechallenge.model.response.GetInfoResponse
 import com.example.ybsmobilechallenge.model.response.SearchResponse
 import com.example.ybsmobilechallenge.util.Constants
@@ -25,7 +26,8 @@ interface ApiService {
         @Query("api_key") apiKey: String = Constants.FLICKR_API_KEY,
         @Query("user_id") userId: String?,
         @Query("format") format: String = "json",
-        @Query("tags") tags: String,
+        @Query("tags") tags: String?,
+        @Query("text") text: String?,
         @Query("tag_mode") tagMode: String = "any",
         @Query("per_page") perPage: Int = 10,
         @Query("safe_search") safeSearch: Int = 1,
@@ -41,5 +43,15 @@ interface ApiService {
         @Query("secret") secret: String,
         @Query("nojsoncallback") nojsoncallback: Int = 1
     ): Response<GetInfoResponse>
+
+    @GET("rest")
+    suspend fun findByUsername(
+        @Query("method") method: String = Endpoints.FLICKR_GET_USER_ID_METHOD,
+        @Query("api_key") apiKey: String = Constants.FLICKR_API_KEY,
+        @Query("username") username: String,
+        @Query("format") format: String = "json",
+        @Query("safe_search") safeSearch: Int = 1,
+        @Query("nojsoncallback") nojsoncallback: Int = 1
+    ): Response<FindByUsernameResponse>
 
 }
